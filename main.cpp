@@ -7,6 +7,13 @@
 
 using namespace std;
 
+struct Uzytkownik
+{
+    int idUzytkownika;
+    int idUzytkownika;
+    string login, haslo;
+};
+
 struct Kontakt {
     int id;
     string imie;
