@@ -49,6 +49,26 @@ int logowanie (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow)
     return 0;
 }
 
+void zapiszUzytkownikaDoPliku(Uzytkownik daneUzytkownikaZarejestrowanego) {
+    fstream plik;
+    plik.open("Uzytkownicy.txt", ios::out | ios::app);
+
+    if(plik.good()== true) {
+        plik << daneUzytkownikaZarejestrowanego.idUzytkownika << "|";
+        plik << daneUzytkownikaZarejestrowanego.login << "|";
+        plik << daneUzytkownikaZarejestrowanego.haslo << "|" << endl;
+
+        plik.close();
+
+        cout << endl << "Nowe konto uzytkownika zostalo zalozone" << endl;
+
+        Sleep(1900);
+    } else {
+        cout << "Nie udalo sie otworzyc pliku i zapisac do niego danych nowego uzytkownika." << endl;
+        Sleep(1900);
+    }
+}
+
 vector <Uzytkownik> rejestracja (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow)
 {
     Uzytkownik daneUzytkownikaDoRejestracji;
@@ -76,14 +96,12 @@ vector <Uzytkownik> rejestracja (vector <Uzytkownik> uzytkownicy, int liczbaUzyt
     uzytkownicy.push_back(Uzytkownik());
     uzytkownicy[liczbaUzytkownikow].login = daneUzytkownikaDoRejestracji.login;
     uzytkownicy[liczbaUzytkownikow].haslo = daneUzytkownikaDoRejestracji.haslo;
-    uzytkownicy[liczbaUzytkownikow].idUzytkownika = liczbaUzytkownikow + 1;
+    daneUzytkownikaDoRejestracji.idUzytkownika = liczbaUzytkownikow + 1;
+    uzytkownicy[liczbaUzytkownikow].idUzytkownika = daneUzytkownikaDoRejestracji.idUzytkownika;
 
-    cout << endl << "Nowe konto zostalo zalozone" << endl;
-
-    Sleep(1500);  // zatrzymanie ekranu
+    zapiszUzytkownikaDoPliku(daneUzytkownikaDoRejestracji);
 
     return uzytkownicy;
-
 }
 
 struct Kontakt {
@@ -542,7 +560,8 @@ int main() {
     vector <Uzytkownik> uzytkownicy;
     int liczbaUzytkownikow = 0;
     int idZalogowanegoUzytkownika = 0;  // 0 tj. zaden uzytkownik nie jest zalogowany
-    char wybor;
+    char wyborI;
+    char wyborII;
 
     vector <Kontakt> kontakty;
     int liczbaKontaktow;
@@ -557,9 +576,9 @@ int main() {
             cout << "1. Logowanie" << endl;
             cout << "2. Rejestracja" << endl;
             cout << "3. Zamknij program" << endl;
-            wybor = getch();
+            wyborI = getch();
 
-            switch(wybor) {
+            switch(wyborI) {
             case '1':
                 idZalogowanegoUzytkownika = logowanie(uzytkownicy, liczbaUzytkownikow);
                 break;
@@ -582,11 +601,11 @@ int main() {
             cout << "5. Usun adresata" << endl;
             cout << "6. Edytuj adresata" << endl;
             cout << "7. Zmien haslo" << endl;
-            cout << "8. Zakoncz program" << endl << endl;
+            cout << "8. Wyloguj sie" << endl << endl;
             cout << "Twoj wybor: ";
 
-            wybor = getch();
-            switch(wybor) {
+            wyborII = getch();
+            switch(wyborII) {
             case '1':
                 kontakty = stworzNowyKontakt (kontakty, liczbaKontaktow);
                 liczbaKontaktow = kontakty.size();
