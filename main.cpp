@@ -49,6 +49,68 @@ int logowanie (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow)
     return 0;
 }
 
+string pobierzDoPionowejKreski (string danePobraneWJednejLinii, int pozycja) {
+    string informacja = "";
+    do {
+        informacja += danePobraneWJednejLinii[pozycja];
+        pozycja++;
+    } while (danePobraneWJednejLinii[pozycja] != '|');
+
+    return informacja;
+}
+
+Uzytkownik rozbijNaPojedynczeDaneUzytkownika (string pobraneWJednejLiniiDaneJednegoUzytkownika) {
+    Uzytkownik daneUzytkownika;
+    string idTekst = "";
+    for (int pozycja = 0; pozycja < pobraneWJednejLiniiDaneJednegoUzytkownika.length(); pozycja++) {
+
+        idTekst = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoUzytkownika, pozycja);
+        pozycja += (idTekst.length() +1);  // plus 1 - pominiecie pionowej linii
+        daneUzytkownika.idUzytkownika = atoi(idTekst.c_str());
+
+        daneUzytkownika.login = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoUzytkownika, pozycja);
+        pozycja += (daneUzytkownika.login.length() +1);
+
+        daneUzytkownika.haslo = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoUzytkownika, pozycja);
+        pozycja += (daneUzytkownika.haslo.length() +1);
+    }
+    return daneUzytkownika;
+}
+vector <Uzytkownik> dodajObiektdaneUzytkownikaDoWektoraUzytkownicy (vector <Uzytkownik> uzytkownicy, Uzytkownik daneUzytkownika, int nrUzytkownika) {
+    uzytkownicy.push_back(Uzytkownik());
+    uzytkownicy[nrUzytkownika].idUzytkownika = daneUzytkownika.idUzytkownika;
+    uzytkownicy[nrUzytkownika].login = daneUzytkownika.login;
+    uzytkownicy[nrUzytkownika].haslo = daneUzytkownika.haslo;
+
+    return uzytkownicy;
+}
+
+vector <Uzytkownik> odczytajZPlikuUzytkownik (vector <Uzytkownik> uzytkownicy) {
+    Uzytkownik daneUzytkownika;
+    string pobraneWJednejLiniiDaneJednegoUzytkownika = "";
+    int nrLinii = 1;
+    int nrUzytkownika = 0;
+
+    fstream plik;
+    plik.open("Uzytkownicy.txt", ios::in);
+
+    if(plik.good() == true) {
+        while(getline(plik,pobraneWJednejLiniiDaneJednegoUzytkownika)) {
+            switch(nrLinii) {
+            case 1:
+                daneUzytkownika = rozbijNaPojedynczeDaneUzytkownika (pobraneWJednejLiniiDaneJednegoUzytkownika);
+                uzytkownicy = dodajObiektdaneUzytkownikaDoWektoraUzytkownicy (uzytkownicy, daneUzytkownika, nrUzytkownika);
+                break;
+            }
+            nrLinii = 1;
+            nrUzytkownika++;
+        }
+        plik.close();
+    }
+
+    return uzytkownicy;
+}
+
 void zapiszUzytkownikaDoPliku(Uzytkownik daneUzytkownikaZarejestrowanego) {
     fstream plik;
     plik.open("Uzytkownicy.txt", ios::out | ios::app);
@@ -119,38 +181,28 @@ string wczytajLinie() {
     return wczytanaLinia;
 }
 
-string zapiszInformacjeDoObiektuDaneKontaktu (string pobraneWJednejLiniiDaneJednegoKontaktu, int pozycja) {
-    string informacja = "";
-    do {
-        informacja += pobraneWJednejLiniiDaneJednegoKontaktu[pozycja];
-        pozycja++;
-    } while (pobraneWJednejLiniiDaneJednegoKontaktu[pozycja] != '|');
-
-    return informacja;
-}
-
 Kontakt rozbijNaPojedynczeDane (string pobraneWJednejLiniiDaneJednegoKontaktu) {
     Kontakt daneKontaktu;
     string idTekst = "";
     for (int pozycja = 0; pozycja < pobraneWJednejLiniiDaneJednegoKontaktu.length(); pozycja++) {
 
-        idTekst = zapiszInformacjeDoObiektuDaneKontaktu (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
+        idTekst = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
         pozycja += (idTekst.length() +1);  // plus 1 - pominiecie pionowej linii
         daneKontaktu.id = atoi(idTekst.c_str());
 
-        daneKontaktu.imie = zapiszInformacjeDoObiektuDaneKontaktu (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
+        daneKontaktu.imie = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
         pozycja += (daneKontaktu.imie.length() +1);
 
-        daneKontaktu.nazwisko = zapiszInformacjeDoObiektuDaneKontaktu (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
+        daneKontaktu.nazwisko = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
         pozycja += (daneKontaktu.nazwisko.length() +1);
 
-        daneKontaktu.nrTelefonu = zapiszInformacjeDoObiektuDaneKontaktu (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
+        daneKontaktu.nrTelefonu = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
         pozycja += (daneKontaktu.nrTelefonu.length() +1);
 
-        daneKontaktu.email = zapiszInformacjeDoObiektuDaneKontaktu (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
+        daneKontaktu.email = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
         pozycja += (daneKontaktu.email.length() +1);
 
-        daneKontaktu.adres = zapiszInformacjeDoObiektuDaneKontaktu (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
+        daneKontaktu.adres = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
         pozycja += (daneKontaktu.adres.length() +1);
     }
     return daneKontaktu;
@@ -564,6 +616,9 @@ int main() {
 
     vector <Kontakt> kontakty;
     int liczbaKontaktow;
+
+    uzytkownicy = odczytajZPlikuUzytkownik(uzytkownicy);
+    liczbaUzytkownikow = uzytkownicy.size();
 
     kontakty = odczytajZPliku (kontakty);
     liczbaKontaktow = kontakty.size();
