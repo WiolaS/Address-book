@@ -560,8 +560,7 @@ int main() {
     vector <Uzytkownik> uzytkownicy;
     int liczbaUzytkownikow = 0;
     int idZalogowanegoUzytkownika = 0;  // 0 tj. zaden uzytkownik nie jest zalogowany
-    char wyborI;
-    char wyborII;
+    char wybor;
 
     vector <Kontakt> kontakty;
     int liczbaKontaktow;
@@ -576,9 +575,9 @@ int main() {
             cout << "1. Logowanie" << endl;
             cout << "2. Rejestracja" << endl;
             cout << "3. Zamknij program" << endl;
-            wyborI = getch();
+            wybor = getch();
 
-            switch(wyborI) {
+            switch(wybor) {
             case '1':
                 idZalogowanegoUzytkownika = logowanie(uzytkownicy, liczbaUzytkownikow);
                 break;
@@ -604,8 +603,8 @@ int main() {
             cout << "8. Wyloguj sie" << endl << endl;
             cout << "Twoj wybor: ";
 
-            wyborII = getch();
-            switch(wyborII) {
+            wybor = getch();
+            switch(wybor) {
             case '1':
                 kontakty = stworzNowyKontakt (kontakty, liczbaKontaktow);
                 liczbaKontaktow = kontakty.size();
