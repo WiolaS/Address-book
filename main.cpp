@@ -16,8 +16,7 @@ struct Kontakt {
     string adres;
 };
 
-string wczytajLinie()
-{
+string wczytajLinie() {
     string wczytanaLinia = "";
     getline(cin, wczytanaLinia);
     return wczytanaLinia;
@@ -81,8 +80,7 @@ vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty) {
     fstream plik;
     plik.open("ksiazkaAdresowa.txt", ios::in);
 
-    if(plik.good() == true)
-    {
+    if(plik.good() == true) {
         while(getline(plik,pobraneWJednejLiniiDaneJednegoKontaktu)) {
             switch(nrLinii) {
             case 1:
@@ -144,8 +142,7 @@ vector <Kontakt> stworzNowyKontakt (vector <Kontakt> kontakty, int liczbaKontakt
 
     if (liczbaKontaktow != 0) {
         daneKontaktu.id = (kontakty.back().id + 1);
-    }
-    else {
+    } else {
         daneKontaktu.id = 1;
     }
 
@@ -332,8 +329,7 @@ vector <Kontakt> usunWybranyKontakt (vector <Kontakt> kontakty, int liczbaKontak
                 liczbaWynikow++;
                 cout << "Kontakt zostal usuniety.";
                 Sleep(1900);
-            }
-            else {
+            } else {
                 liczbaWynikow++;
                 cout <<"Nie usunieto kontaktu." << endl;
                 Sleep(1900);
@@ -471,51 +467,76 @@ int main() {
     liczbaKontaktow = kontakty.size();
 
     while(1) {
-        system("cls");
-        cout << endl << "------- KSIAZKA ADRESOWA -------" << endl << endl;
-        cout << "1. Dodaj adresata" << endl;
-        cout << "2. Wyszukaj po imieniu" << endl;
-        cout << "3. Wyszukaj po nazwisku" << endl;
-        cout << "4. Wyswietl wszystkich adresatow" << endl;
-        cout << "5. Usun adresata" << endl;
-        cout << "6. Edytuj adresata" << endl;
-        cout << "7. Zakoncz program" << endl << endl;
-        cout << "Twoj wybor: ";
+        if (idZalogowanegoUzytkownika == 0) {
+            system("cls"); // czyszczenie ekranu  ; dodajemy biblioteke <windows.h>
+            cout << endl << "------- KSIAZKA ADRESOWA -------" << endl << endl;
+            cout << "1. Logowanie" << endl;
+            cout << "2. Rejestracja" << endl;
+            cout << "3. Zamknij program" << endl;
+            wybor = getch();
+            switch(wybor) {
+            case '1':
+                break;
 
-        wybor = getch();
-        switch(wybor) {
-        case '1':
-            kontakty = stworzNowyKontakt (kontakty, liczbaKontaktow);
-            liczbaKontaktow = kontakty.size();
-            break;
+            case '2':
+                break;
 
-        case '2':
-            znajdzKontaktPoImieniu (kontakty, liczbaKontaktow);
-            break;
+            case '3':
+                exit(0);
+            }
+        } else {
+            system("cls");
+            cout << endl << "------- KSIAZKA ADRESOWA -------" << endl << endl;
+            cout << "1. Dodaj adresata" << endl;
+            cout << "2. Wyszukaj po imieniu" << endl;
+            cout << "3. Wyszukaj po nazwisku" << endl;
+            cout << "4. Wyswietl wszystkich adresatow" << endl;
+            cout << "5. Usun adresata" << endl;
+            cout << "6. Edytuj adresata" << endl;
+            cout << "7. Zmien haslo" << endl;
+            cout << "8. Zakoncz program" << endl << endl;
+            cout << "Twoj wybor: ";
 
-        case '3':
-            znajdzKontaktPoNazwisku (kontakty, liczbaKontaktow);
-            break;
+            wybor = getch();
+            switch(wybor) {
+            case '1':
+                kontakty = stworzNowyKontakt (kontakty, liczbaKontaktow);
+                liczbaKontaktow = kontakty.size();
+                break;
 
-        case '4':
-            wyswietlWszystkieKontakty(kontakty, liczbaKontaktow);
-            break;
+            case '2':
+                znajdzKontaktPoImieniu (kontakty, liczbaKontaktow);
+                break;
 
-        case '5':
-            kontakty = usunWybranyKontakt (kontakty, liczbaKontaktow);
-            liczbaKontaktow = kontakty.size();
-            zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow);
-            break;
+            case '3':
+                znajdzKontaktPoNazwisku (kontakty, liczbaKontaktow);
+                break;
 
-        case '6':
-            kontakty = wybierzKontaktDoEdycji (kontakty,liczbaKontaktow);
-            zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow);
+            case '4':
+                wyswietlWszystkieKontakty(kontakty, liczbaKontaktow);
+                break;
 
-            break;
+            case '5':
+                kontakty = usunWybranyKontakt (kontakty, liczbaKontaktow);
+                liczbaKontaktow = kontakty.size();
+                zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow);
+                break;
 
-        case '7':
-            exit(0);
+            case '6':
+                kontakty = wybierzKontaktDoEdycji (kontakty,liczbaKontaktow);
+                zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow);
+
+                break;
+
+            case '7':
+            case '7':
+                break;
+
+            case '8':
+                break;
+            }
         }
+
     }
     return 0;
 }
