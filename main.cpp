@@ -701,6 +701,7 @@ int main() {
                 break;
 
             case '8':
+                idZalogowanegoUzytkownika = 0;
                 break;
             }
         }
