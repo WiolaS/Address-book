@@ -167,7 +167,8 @@ vector <Uzytkownik> rejestracja (vector <Uzytkownik> uzytkownicy, int liczbaUzyt
 }
 
 struct Kontakt {
-    int id;
+    int idAdresata;
+    int idUzytkownika;
     string imie;
     string nazwisko;
     string nrTelefonu;
@@ -188,7 +189,11 @@ Kontakt rozbijNaPojedynczeDane (string pobraneWJednejLiniiDaneJednegoKontaktu) {
 
         idTekst = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
         pozycja += (idTekst.length() +1);  // plus 1 - pominiecie pionowej linii
-        daneKontaktu.id = atoi(idTekst.c_str());
+        daneKontaktu.idAdresata = atoi(idTekst.c_str());
+
+        idTekst = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
+        pozycja += (idTekst.length() +1);
+        daneKontaktu.idUzytkownika = atoi(idTekst.c_str());
 
         daneKontaktu.imie = pobierzDoPionowejKreski (pobraneWJednejLiniiDaneJednegoKontaktu, pozycja);
         pozycja += (daneKontaktu.imie.length() +1);
@@ -208,9 +213,10 @@ Kontakt rozbijNaPojedynczeDane (string pobraneWJednejLiniiDaneJednegoKontaktu) {
     return daneKontaktu;
 }
 
-vector <Kontakt> dodajObiektdaneKontaktuDoWektoraKontakty (vector <Kontakt> kontakty, Kontakt daneKontaktu, int nrKontaktu) {
+vector <Kontakt> dodajObiektdaneKontaktuDoWektoraKontakty (vector <Kontakt> kontakty, Kontakt daneKontaktu, int nrKontaktu, int idZalogowanegoKontaktu) {
     kontakty.push_back(Kontakt());
-    kontakty[nrKontaktu].id = daneKontaktu.id;
+    kontakty[nrKontaktu].idAdresata = daneKontaktu.idAdresata;
+    kontakty[nrKontaktu].idUzytkownika = idZalogowanegoKontaktu;
     kontakty[nrKontaktu].imie = daneKontaktu.imie;
     kontakty[nrKontaktu].nazwisko = daneKontaktu.nazwisko;
     kontakty[nrKontaktu].nrTelefonu = daneKontaktu.nrTelefonu;
@@ -220,21 +226,21 @@ vector <Kontakt> dodajObiektdaneKontaktuDoWektoraKontakty (vector <Kontakt> kont
     return kontakty;
 }
 
-vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty) {
+vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty, int idZalogowanegoUzytkownika) {
     Kontakt daneKontaktu;
     string pobraneWJednejLiniiDaneJednegoKontaktu = "";
     int nrLinii = 1;
     int nrKontaktu = 0;
 
     fstream plik;
-    plik.open("ksiazkaAdresowa.txt", ios::in);
+    plik.open("Adresaci.txt", ios::in);
 
     if(plik.good() == true) {
         while(getline(plik,pobraneWJednejLiniiDaneJednegoKontaktu)) {
             switch(nrLinii) {
             case 1:
                 daneKontaktu = rozbijNaPojedynczeDane (pobraneWJednejLiniiDaneJednegoKontaktu);
-                kontakty = dodajObiektdaneKontaktuDoWektoraKontakty (kontakty, daneKontaktu, nrKontaktu);
+                kontakty = dodajObiektdaneKontaktuDoWektoraKontakty (kontakty, daneKontaktu, nrKontaktu, idZalogowanegoUzytkownika);
                 break;
             }
             nrLinii = 1;
@@ -246,12 +252,13 @@ vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty) {
     return kontakty;
 }
 
-void zapiszKontaktDoPliku(Kontakt daneKontaktowe) {
+void zapiszKontaktDoPliku(Kontakt daneKontaktowe, int idZalogowanegoUzytkownika) {
     fstream plik;
-    plik.open("ksiazkaAdresowa.txt", ios::out | ios::app);
+    plik.open("Adresaci.txt", ios::out | ios::app);
 
     if(plik.good()== true) {
-        plik << daneKontaktowe.id << "|";
+        plik << daneKontaktowe.idAdresata << "|";
+        plik << idZalogowanegoUzytkownika << "|";
         plik << daneKontaktowe.imie << "|";
         plik << daneKontaktowe.nazwisko << "|";
         plik << daneKontaktowe.nrTelefonu << "|";
@@ -268,7 +275,7 @@ void zapiszKontaktDoPliku(Kontakt daneKontaktowe) {
     }
 }
 
-vector <Kontakt> stworzNowyKontakt (vector <Kontakt> kontakty, int liczbaKontaktow) {
+vector <Kontakt> stworzNowyKontakt (vector <Kontakt> kontakty, int liczbaKontaktow, int idZalogowanegoUzytkownika) {
     Kontakt daneKontaktu;
     system("cls");
 
@@ -290,20 +297,20 @@ vector <Kontakt> stworzNowyKontakt (vector <Kontakt> kontakty, int liczbaKontakt
     cin.sync();
 
     if (liczbaKontaktow != 0) {
-        daneKontaktu.id = (kontakty.back().id + 1);
+        daneKontaktu.idAdresata = (kontakty.back().idAdresata + 1);
     } else {
-        daneKontaktu.id = 1;
+        daneKontaktu.idAdresata = 1;
     }
 
-    zapiszKontaktDoPliku(daneKontaktu);
-    kontakty = dodajObiektdaneKontaktuDoWektoraKontakty (kontakty, daneKontaktu, liczbaKontaktow);
+    zapiszKontaktDoPliku(daneKontaktu, idZalogowanegoUzytkownika);
+    kontakty = dodajObiektdaneKontaktuDoWektoraKontakty (kontakty, daneKontaktu, liczbaKontaktow, idZalogowanegoUzytkownika);
 
     return kontakty;
 }
 
 void wyswietlSzczegolyKontaktu(vector <Kontakt> kontakty, int nrIdKontaktu) {
     cout << "------------------------------------------";
-    cout << endl << "Id:                 " << kontakty[nrIdKontaktu].id << endl;
+    cout << endl << "Id:                 " << kontakty[nrIdKontaktu].idAdresata << endl;
     cout << "imie i nazwisko:    " << kontakty[nrIdKontaktu].imie << " " << kontakty[nrIdKontaktu].nazwisko << endl;
     cout << "nr telefonu:        " << kontakty[nrIdKontaktu].nrTelefonu << endl;
     cout << "adres email:        " << kontakty[nrIdKontaktu].email<< endl;
@@ -316,7 +323,7 @@ int wyswietlListeWybranychKontaktow (vector <Kontakt> kontakty, int liczbaKontak
 
     for (int i = 0; i < liczbaKontaktow; i++) {
         if (wyszukiwaneImie == kontakty[i].imie || wyszukiwaneNazwisko == kontakty[i].nazwisko) {
-            cout << kontakty[i].id  << ". " << kontakty[i].imie << " " << kontakty[i].nazwisko << endl;
+            cout << kontakty[i].idAdresata  << ". " << kontakty[i].imie << " " << kontakty[i].nazwisko << endl;
             liczbaWynikow++;
         }
     }
@@ -345,7 +352,7 @@ void znajdzKontaktPoImieniu (vector <Kontakt> kontakty, int liczbaKontaktow) {
         liczbaWynikow = 0;
 
         for (int i = 0; i < liczbaKontaktow; i++) {
-            if (wyborId == kontakty[i].id && imie == kontakty[i].imie) {
+            if (wyborId == kontakty[i].idAdresata && imie == kontakty[i].imie) {
                 wyswietlSzczegolyKontaktu(kontakty, i);
                 liczbaWynikow++;
             }
@@ -379,7 +386,7 @@ void znajdzKontaktPoNazwisku (vector <Kontakt> kontakty, int liczbaKontaktow) {
         liczbaWynikow = 0;
 
         for (int i = 0; i < liczbaKontaktow; i++) {
-            if (wyborId == kontakty[i].id && nazwisko == kontakty[i].nazwisko) {
+            if (wyborId == kontakty[i].idAdresata && nazwisko == kontakty[i].nazwisko) {
                 wyswietlSzczegolyKontaktu(kontakty, i);
                 liczbaWynikow++;
             }
@@ -397,7 +404,7 @@ void wyswietlListeWszystkichKontaktow (vector <Kontakt> kontakty, int liczbaKont
     cout << endl << "-------------- Lista kontaktow ---------------" << endl << endl;
 
     for (int i = 0; i < liczbaKontaktow; i++) {
-        cout << kontakty[i].id  << ". " << kontakty[i].imie << " " << kontakty[i].nazwisko << endl;
+        cout << kontakty[i].idAdresata  << ". " << kontakty[i].imie << " " << kontakty[i].nazwisko << endl;
     }
 }
 
@@ -441,7 +448,7 @@ void wyswietlWszystkieKontakty (vector <Kontakt> kontakty, int liczbaKontaktow) 
         liczbaWynikow = 0;
 
         for (int i = 0; i < liczbaKontaktow; i++) {
-            if (wyborId == kontakty[i].id) {
+            if (wyborId == kontakty[i].idAdresata) {
                 system("cls");
                 wyswietlSzczegolyKontaktu(kontakty, i);
                 wyswietlMenuListyKontaktow (kontakty, liczbaKontaktow);
@@ -469,7 +476,7 @@ vector <Kontakt> usunWybranyKontakt (vector <Kontakt> kontakty, int liczbaKontak
     cin >> wyborId;
 
     for (int i = 0; i < liczbaKontaktow; i++) {
-        if (wyborId == kontakty[i].id) {
+        if (wyborId == kontakty[i].idAdresata) {
             cout << "Czy na pewno chcesz usunac ten kontakt? \nt (tak) / n (nie):";
 
             cin >> potwierdzenieUsuniecia;
@@ -590,13 +597,14 @@ vector <Kontakt> wybierzKontaktDoEdycji (vector <Kontakt> kontakty, int numerIdK
     return kontakty;
 }
 
-void zapiszPonownieKontaktyDoPliku(vector <Kontakt> kontakty, int liczbaKontaktow) {
+void zapiszPonownieKontaktyDoPliku(vector <Kontakt> kontakty, int liczbaKontaktow, int idZalogowanegoUzytkownika) {
     fstream plik;
-    plik.open("ksiazkaAdresowa.txt", ios::in | ios::out | ios::trunc );
+    plik.open("Adresaci.txt", ios::in | ios::out | ios::trunc );
 
     if(plik.good()) {
         for (int i = 0; i < liczbaKontaktow; i++) {
-            plik << kontakty[i].id << "|";
+            plik << kontakty[i].idAdresata << "|";
+            plik << idZalogowanegoUzytkownika << "|";
             plik << kontakty[i].imie << "|";
             plik << kontakty[i].nazwisko << "|";
             plik << kontakty[i].nrTelefonu << "|";
@@ -620,7 +628,7 @@ int main() {
     uzytkownicy = odczytajZPlikuUzytkownik(uzytkownicy);
     liczbaUzytkownikow = uzytkownicy.size();
 
-    kontakty = odczytajZPliku (kontakty);
+    kontakty = odczytajZPliku (kontakty, idZalogowanegoUzytkownika); /// poprawiæ
     liczbaKontaktow = kontakty.size();
 
     while(1) {
@@ -661,7 +669,7 @@ int main() {
             wybor = getch();
             switch(wybor) {
             case '1':
-                kontakty = stworzNowyKontakt (kontakty, liczbaKontaktow);
+                kontakty = stworzNowyKontakt (kontakty, liczbaKontaktow, idZalogowanegoUzytkownika);
                 liczbaKontaktow = kontakty.size();
                 break;
 
@@ -680,12 +688,12 @@ int main() {
             case '5':
                 kontakty = usunWybranyKontakt (kontakty, liczbaKontaktow);
                 liczbaKontaktow = kontakty.size();
-                zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow);
+                zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow, idZalogowanegoUzytkownika);
                 break;
 
             case '6':
                 kontakty = wybierzKontaktDoEdycji (kontakty,liczbaKontaktow);
-                zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow);
+                zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow, idZalogowanegoUzytkownika);
 
                 break;
 
