@@ -10,9 +10,81 @@ using namespace std;
 struct Uzytkownik
 {
     int idUzytkownika;
-    int idUzytkownika;
     string login, haslo;
 };
+
+int logowanie (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow)
+{
+    Uzytkownik daneUzytkownikaDoZalogowania;
+
+    cout << endl << "Podaj login: ";
+    cin >> daneUzytkownikaDoZalogowania.login;
+
+    int i = 0;
+    while (i < liczbaUzytkownikow)
+    {
+        if (uzytkownicy[i].login == daneUzytkownikaDoZalogowania.login)
+        {
+            for (int proby = 0; proby < 3; proby++)
+            {
+                cout << "Podaj haslo. Pozostalo prob " << 3 - proby << ": ";
+                cin >> daneUzytkownikaDoZalogowania.haslo;
+                if (uzytkownicy[i].haslo == daneUzytkownikaDoZalogowania.haslo)
+                {
+                    cout << "Zalogowales sie" << endl;
+                    Sleep(1000);
+
+                    return uzytkownicy[i].idUzytkownika;   // mozemy od razu zakonczyc dzialanie funkcji i zwrocic wartosc id uzytkownika
+                }
+            }
+            cout << "Podales 3 razy bledne haslo. Poczekaj 3 sekundy przed kolejna proba." << endl;
+            Sleep(3000);
+            return 0;
+        }
+        i++;
+    }
+    cout << "Nie ma uztkownika z takim loginem." << endl;
+    Sleep(1500);
+
+    return 0;
+}
+
+vector <Uzytkownik> rejestracja (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow)
+{
+    Uzytkownik daneUzytkownikaDoRejestracji;
+
+    cout << "Podaj swoj login: ";
+    cin >> daneUzytkownikaDoRejestracji.login;
+
+    int i = 0;
+    while (i < liczbaUzytkownikow)
+    {
+        if (uzytkownicy[i].login == daneUzytkownikaDoRejestracji.login)
+        {
+            cout << "Taki login juz istnieje. Prosze podac inny: ";
+            cin >> daneUzytkownikaDoRejestracji.login;
+            i = 0; // zerujemy petle, zeby dzialala od samego poczatku, wtedy petla zaczniedzialac od poczatku
+        }
+        else
+        {
+            i++;
+        }
+    }
+    cout << "Podaj haslo: ";
+    cin >> daneUzytkownikaDoRejestracji.haslo;
+
+    uzytkownicy.push_back(Uzytkownik());
+    uzytkownicy[liczbaUzytkownikow].login = daneUzytkownikaDoRejestracji.login;
+    uzytkownicy[liczbaUzytkownikow].haslo = daneUzytkownikaDoRejestracji.haslo;
+    uzytkownicy[liczbaUzytkownikow].idUzytkownika = liczbaUzytkownikow + 1;
+
+    cout << endl << "Nowe konto zostalo zalozone" << endl;
+
+    Sleep(1500);  // zatrzymanie ekranu
+
+    return uzytkownicy;
+
+}
 
 struct Kontakt {
     int id;
@@ -466,9 +538,14 @@ void zapiszPonownieKontaktyDoPliku(vector <Kontakt> kontakty, int liczbaKontakto
 }
 
 int main() {
+
+    vector <Uzytkownik> uzytkownicy;
+    int liczbaUzytkownikow = 0;
+    int idZalogowanegoUzytkownika = 0;  // 0 tj. zaden uzytkownik nie jest zalogowany
+    char wybor;
+
     vector <Kontakt> kontakty;
     int liczbaKontaktow;
-    char wybor;
 
     kontakty = odczytajZPliku (kontakty);
     liczbaKontaktow = kontakty.size();
@@ -481,11 +558,15 @@ int main() {
             cout << "2. Rejestracja" << endl;
             cout << "3. Zamknij program" << endl;
             wybor = getch();
+
             switch(wybor) {
             case '1':
+                idZalogowanegoUzytkownika = logowanie(uzytkownicy, liczbaUzytkownikow);
                 break;
 
             case '2':
+                uzytkownicy = rejestracja(uzytkownicy, liczbaUzytkownikow);
+                liczbaUzytkownikow++;
                 break;
 
             case '3':
@@ -535,7 +616,6 @@ int main() {
 
                 break;
 
-            case '7':
             case '7':
                 break;
 
