@@ -615,6 +615,45 @@ void zapiszPonownieKontaktyDoPliku(vector <Kontakt> kontakty, int liczbaKontakto
     }
 }
 
+vector <Uzytkownik> zmianaHasla (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow, int idZalogowanegoUzytkownika)
+{
+    Uzytkownik daneUzytkownikaZalogowanego;
+    int dlugoscCiaguTekstowego = 0;
+
+    cout << "Podaj nowe haslo: ";
+    cin >> daneUzytkownikaZalogowanego.haslo;
+
+    for (int i = 0; i < liczbaUzytkownikow; i++)
+    {
+        if (uzytkownicy[i].idUzytkownika == idZalogowanegoUzytkownika)
+        {
+
+        dlugoscCiaguTekstowego = uzytkownicy[idZalogowanegoUzytkownika -1].haslo.length();
+        uzytkownicy[idZalogowanegoUzytkownika -1].haslo.replace(0,dlugoscCiaguTekstowego,daneUzytkownikaZalogowanego.haslo);
+
+        cout << "Haslo zostalo zmienione" << endl;
+        Sleep(1500);
+        }
+    }
+
+    return uzytkownicy;
+}
+
+void zapiszPonownieKontaktyDoPlikuAdresaci(vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow, int idZalogowanegoUzytkownika) {
+    fstream plik;
+    plik.open("Uzytkownicy.txt", ios::in | ios::out | ios::trunc );
+
+    if(plik.good()) {
+        for (int i = 0; i < liczbaUzytkownikow; i++) {
+            plik << uzytkownicy[i].idUzytkownika << "|";
+            plik << uzytkownicy[i].login << "|";
+            plik << uzytkownicy[i].haslo << "|" << endl;
+        }
+        plik.close();
+    }
+}
+
+
 int main() {
 
     vector <Uzytkownik> uzytkownicy;
@@ -698,6 +737,8 @@ int main() {
                 break;
 
             case '7':
+                uzytkownicy = zmianaHasla (uzytkownicy, liczbaUzytkownikow, idZalogowanegoUzytkownika);
+                zapiszPonownieKontaktyDoPlikuAdresaci(uzytkownicy, liczbaUzytkownikow, idZalogowanegoUzytkownika);
                 break;
 
             case '8':
