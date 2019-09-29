@@ -7,32 +7,27 @@
 
 using namespace std;
 
-struct Uzytkownik
-{
+struct Uzytkownik {
     int idUzytkownika;
     string login, haslo;
 };
 
-int logowanie (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow)
-{
+int logowanie (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow) {
     Uzytkownik daneUzytkownikaDoZalogowania;
 
     cout << endl << "Podaj login: ";
     cin >> daneUzytkownikaDoZalogowania.login;
 
     int i = 0;
-    while (i < liczbaUzytkownikow)
-    {
-        if (uzytkownicy[i].login == daneUzytkownikaDoZalogowania.login)
-        {
-            for (int proby = 0; proby < 3; proby++)
-            {
+    while (i < liczbaUzytkownikow) {
+        if (uzytkownicy[i].login == daneUzytkownikaDoZalogowania.login) {
+            for (int proby = 0; proby < 3; proby++) {
                 cout << "Podaj haslo. Pozostalo prob " << 3 - proby << ": ";
                 cin >> daneUzytkownikaDoZalogowania.haslo;
-                if (uzytkownicy[i].haslo == daneUzytkownikaDoZalogowania.haslo)
-                {
+                if (uzytkownicy[i].haslo == daneUzytkownikaDoZalogowania.haslo) {
                     cout << "Zalogowales sie" << endl;
-                    Sleep(1000);
+                    cout << "uzytkownicy[i].idUzytkownika" << uzytkownicy[i].idUzytkownika << endl;
+                    Sleep(1800);
 
                     return uzytkownicy[i].idUzytkownika;   // mozemy od razu zakonczyc dzialanie funkcji i zwrocic wartosc id uzytkownika
                 }
@@ -131,24 +126,19 @@ void zapiszUzytkownikaDoPliku(Uzytkownik daneUzytkownikaZarejestrowanego) {
     }
 }
 
-vector <Uzytkownik> rejestracja (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow)
-{
+vector <Uzytkownik> rejestracja (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow) {
     Uzytkownik daneUzytkownikaDoRejestracji;
 
     cout << "Podaj swoj login: ";
     cin >> daneUzytkownikaDoRejestracji.login;
 
     int i = 0;
-    while (i < liczbaUzytkownikow)
-    {
-        if (uzytkownicy[i].login == daneUzytkownikaDoRejestracji.login)
-        {
+    while (i < liczbaUzytkownikow) {
+        if (uzytkownicy[i].login == daneUzytkownikaDoRejestracji.login) {
             cout << "Taki login juz istnieje. Prosze podac inny: ";
             cin >> daneUzytkownikaDoRejestracji.login;
             i = 0; // zerujemy petle, zeby dzialala od samego poczatku, wtedy petla zaczniedzialac od poczatku
-        }
-        else
-        {
+        } else {
             i++;
         }
     }
@@ -213,10 +203,12 @@ Kontakt rozbijNaPojedynczeDane (string pobraneWJednejLiniiDaneJednegoKontaktu) {
     return daneKontaktu;
 }
 
+
+
 vector <Kontakt> dodajObiektdaneKontaktuDoWektoraKontakty (vector <Kontakt> kontakty, Kontakt daneKontaktu, int nrKontaktu, int idZalogowanegoKontaktu) {
     kontakty.push_back(Kontakt());
     kontakty[nrKontaktu].idAdresata = daneKontaktu.idAdresata;
-    kontakty[nrKontaktu].idUzytkownika = idZalogowanegoKontaktu;
+    kontakty[nrKontaktu].idUzytkownika = daneKontaktu.idUzytkownika;
     kontakty[nrKontaktu].imie = daneKontaktu.imie;
     kontakty[nrKontaktu].nazwisko = daneKontaktu.nazwisko;
     kontakty[nrKontaktu].nrTelefonu = daneKontaktu.nrTelefonu;
@@ -224,6 +216,18 @@ vector <Kontakt> dodajObiektdaneKontaktuDoWektoraKontakty (vector <Kontakt> kont
     kontakty[nrKontaktu].adres = daneKontaktu.adres;
 
     return kontakty;
+}
+
+bool sprawdzCzyKontaktZostalUtworzonyPrzezZalogowanegoUzytkownika ( Kontakt daneKontaktu, int idZalogowanegoKontaktu) {
+
+    cout << "daneKontaktu.idUzytkownika  " << daneKontaktu.idUzytkownika <<endl;
+    cout << "idZalogowanegoKontaktu  " << idZalogowanegoKontaktu << endl;
+    Sleep(1500);
+
+    if (daneKontaktu.idUzytkownika == idZalogowanegoKontaktu)
+        return true;
+    else
+        return false;
 }
 
 vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty, int idZalogowanegoUzytkownika) {
@@ -240,11 +244,19 @@ vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty, int idZalogowanegoUz
             switch(nrLinii) {
             case 1:
                 daneKontaktu = rozbijNaPojedynczeDane (pobraneWJednejLiniiDaneJednegoKontaktu);
-                kontakty = dodajObiektdaneKontaktuDoWektoraKontakty (kontakty, daneKontaktu, nrKontaktu, idZalogowanegoUzytkownika);
+                if (sprawdzCzyKontaktZostalUtworzonyPrzezZalogowanegoUzytkownika (daneKontaktu, idZalogowanegoUzytkownika)) {
+                    kontakty = dodajObiektdaneKontaktuDoWektoraKontakty (kontakty, daneKontaktu, nrKontaktu, idZalogowanegoUzytkownika);
+
+                }
+                else {
+                    nrKontaktu--;
+                }
+
                 break;
             }
             nrLinii = 1;
             nrKontaktu++;
+
         }
         plik.close();
     }
@@ -615,24 +627,21 @@ void zapiszPonownieKontaktyDoPliku(vector <Kontakt> kontakty, int liczbaKontakto
     }
 }
 
-vector <Uzytkownik> zmianaHasla (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow, int idZalogowanegoUzytkownika)
-{
+vector <Uzytkownik> zmianaHasla (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow, int idZalogowanegoUzytkownika) {
     Uzytkownik daneUzytkownikaZalogowanego;
     int dlugoscCiaguTekstowego = 0;
 
     cout << "Podaj nowe haslo: ";
     cin >> daneUzytkownikaZalogowanego.haslo;
 
-    for (int i = 0; i < liczbaUzytkownikow; i++)
-    {
-        if (uzytkownicy[i].idUzytkownika == idZalogowanegoUzytkownika)
-        {
+    for (int i = 0; i < liczbaUzytkownikow; i++) {
+        if (uzytkownicy[i].idUzytkownika == idZalogowanegoUzytkownika) {
 
-        dlugoscCiaguTekstowego = uzytkownicy[idZalogowanegoUzytkownika -1].haslo.length();
-        uzytkownicy[idZalogowanegoUzytkownika -1].haslo.replace(0,dlugoscCiaguTekstowego,daneUzytkownikaZalogowanego.haslo);
+            dlugoscCiaguTekstowego = uzytkownicy[idZalogowanegoUzytkownika -1].haslo.length();
+            uzytkownicy[idZalogowanegoUzytkownika -1].haslo.replace(0,dlugoscCiaguTekstowego,daneUzytkownikaZalogowanego.haslo);
 
-        cout << "Haslo zostalo zmienione" << endl;
-        Sleep(1500);
+            cout << "Haslo zostalo zmienione" << endl;
+            Sleep(1500);
         }
     }
 
@@ -667,8 +676,8 @@ int main() {
     uzytkownicy = odczytajZPlikuUzytkownik(uzytkownicy);
     liczbaUzytkownikow = uzytkownicy.size();
 
-    kontakty = odczytajZPliku (kontakty, idZalogowanegoUzytkownika); /// poprawiæ
-    liczbaKontaktow = kontakty.size();
+    //kontakty = odczytajZPliku (kontakty, idZalogowanegoUzytkownika); /// poprawiæ
+    //liczbaKontaktow = kontakty.size();
 
     while(1) {
         if (idZalogowanegoUzytkownika == 0) {
@@ -681,8 +690,13 @@ int main() {
 
             switch(wybor) {
             case '1':
+                {
+
                 idZalogowanegoUzytkownika = logowanie(uzytkownicy, liczbaUzytkownikow);
+                kontakty = odczytajZPliku (kontakty, idZalogowanegoUzytkownika); /// poprawiæ
+                liczbaKontaktow = kontakty.size();
                 break;
+                }
 
             case '2':
                 uzytkownicy = rejestracja(uzytkownicy, liczbaUzytkownikow);
