@@ -247,8 +247,7 @@ vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty, int idZalogowanegoUz
                 if (sprawdzCzyKontaktZostalUtworzonyPrzezZalogowanegoUzytkownika (daneKontaktu, idZalogowanegoUzytkownika)) {
                     kontakty = dodajObiektdaneKontaktuDoWektoraKontakty (kontakty, daneKontaktu, nrKontaktu, idZalogowanegoUzytkownika);
 
-                }
-                else {
+                } else {
                     nrKontaktu--;
                 }
 
@@ -662,6 +661,15 @@ void zapiszPonownieKontaktyDoPlikuAdresaci(vector <Uzytkownik> uzytkownicy, int 
     }
 }
 
+vector <Kontakt> usunElementyWektoraKontakty (vector <Kontakt> kontakty, int liczbaKontaktow) {
+    for (int i = 0; i < liczbaKontaktow; i++) {
+        kontakty.erase(kontakty.begin());
+        i++;
+    }
+
+    return kontakty;
+}
+
 
 int main() {
 
@@ -689,14 +697,13 @@ int main() {
             wybor = getch();
 
             switch(wybor) {
-            case '1':
-                {
+            case '1': {
 
                 idZalogowanegoUzytkownika = logowanie(uzytkownicy, liczbaUzytkownikow);
                 kontakty = odczytajZPliku (kontakty, idZalogowanegoUzytkownika); /// poprawiæ
                 liczbaKontaktow = kontakty.size();
                 break;
-                }
+            }
 
             case '2':
                 uzytkownicy = rejestracja(uzytkownicy, liczbaUzytkownikow);
@@ -757,6 +764,7 @@ int main() {
 
             case '8':
                 idZalogowanegoUzytkownika = 0;
+                kontakty = usunElementyWektoraKontakty (kontakty, liczbaKontaktow);
                 break;
             }
         }
