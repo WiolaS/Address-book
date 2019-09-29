@@ -263,13 +263,13 @@ vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty, int idZalogowanegoUz
     return kontakty;
 }
 
-void zapiszKontaktDoPliku(Kontakt daneKontaktowe, int idZalogowanegoUzytkownika) {
+void zapiszKontaktDoPliku(Kontakt daneKontaktowe) {
     fstream plik;
     plik.open("Adresaci.txt", ios::out | ios::app);
 
     if(plik.good()== true) {
         plik << daneKontaktowe.idAdresata << "|";
-        plik << idZalogowanegoUzytkownika << "|";
+        plik << daneKontaktowe.idUzytkownika << "|";
         plik << daneKontaktowe.imie << "|";
         plik << daneKontaktowe.nazwisko << "|";
         plik << daneKontaktowe.nrTelefonu << "|";
@@ -313,7 +313,7 @@ vector <Kontakt> stworzNowyKontakt (vector <Kontakt> kontakty, int liczbaKontakt
         daneKontaktu.idAdresata = 1;
     }
 
-    zapiszKontaktDoPliku(daneKontaktu, idZalogowanegoUzytkownika);
+    zapiszKontaktDoPliku(daneKontaktu);
     kontakty = dodajObiektdaneKontaktuDoWektoraKontakty (kontakty, daneKontaktu, liczbaKontaktow, idZalogowanegoUzytkownika);
 
     return kontakty;
@@ -608,14 +608,14 @@ vector <Kontakt> wybierzKontaktDoEdycji (vector <Kontakt> kontakty, int numerIdK
     return kontakty;
 }
 
-void zapiszPonownieKontaktyDoPliku(vector <Kontakt> kontakty, int liczbaKontaktow, int idZalogowanegoUzytkownika) {
+void zapiszPonownieKontaktyDoPliku(vector <Kontakt> kontakty, int liczbaKontaktow) {
     fstream plik;
     plik.open("Adresaci.txt", ios::in | ios::out | ios::trunc );
 
     if(plik.good()) {
         for (int i = 0; i < liczbaKontaktow; i++) {
             plik << kontakty[i].idAdresata << "|";
-            plik << idZalogowanegoUzytkownika << "|";
+            plik << kontakty[i].idUzytkownika << "|";
             plik << kontakty[i].imie << "|";
             plik << kontakty[i].nazwisko << "|";
             plik << kontakty[i].nrTelefonu << "|";
@@ -748,12 +748,12 @@ int main() {
             case '5':
                 kontakty = usunWybranyKontakt (kontakty, liczbaKontaktow);
                 liczbaKontaktow = kontakty.size();
-                zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow, idZalogowanegoUzytkownika);
+                zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow);
                 break;
 
             case '6':
                 kontakty = wybierzKontaktDoEdycji (kontakty,liczbaKontaktow);
-                zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow, idZalogowanegoUzytkownika);
+                zapiszPonownieKontaktyDoPliku(kontakty, liczbaKontaktow);
 
                 break;
 
