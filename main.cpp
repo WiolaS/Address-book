@@ -839,7 +839,7 @@ int main() {
                 break;
 
             case '6':
-                kontakty = wybierzKontaktDoEdycji (kontakty, liczbaKontaktow);l
+                kontakty = wybierzKontaktDoEdycji (kontakty, liczbaKontaktow);
                 break;
 
             case '7':
