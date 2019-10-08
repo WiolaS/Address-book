@@ -98,7 +98,7 @@ vector <Uzytkownik> odczytajZPlikuUzytkownik (vector <Uzytkownik> uzytkownicy) {
     return uzytkownicy;
 }
 
-void zapiszUzytkownikaDoPliku(Uzytkownik daneUzytkownikaZarejestrowanego) {
+void zapiszNowegoUzytkownika(Uzytkownik daneUzytkownikaZarejestrowanego) {
     fstream plik;
     plik.open("Uzytkownicy.txt", ios::out | ios::app);
 
@@ -139,7 +139,7 @@ vector <Uzytkownik> rejestracja (vector <Uzytkownik> uzytkownicy, int liczbaUzyt
 
     daneUzytkownikaDoRejestracji.idUzytkownika = liczbaUzytkownikow + 1;
     uzytkownicy = dodajObiektdaneUzytkownikaDoWektoraUzytkownicy ( uzytkownicy, daneUzytkownikaDoRejestracji, liczbaUzytkownikow);
-    zapiszUzytkownikaDoPliku(daneUzytkownikaDoRejestracji);
+    zapiszNowegoUzytkownika(daneUzytkownikaDoRejestracji);
 
     return uzytkownicy;
 }
@@ -224,19 +224,30 @@ vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty, int idZalogowanegoUz
     }
     plik.close();
 
-
     return kontakty;
+}
+
+void zapiszDoPliku (Kontakt oryginalnyKontakt) {
+    fstream plik;
+    plik.open("tymczasowiAdresaci.txt", ios::out | ios::app);
+    if(plik.good()) {
+        plik << oryginalnyKontakt.idAdresata << "|";
+        plik << oryginalnyKontakt.idUzytkownika << "|";
+        plik << oryginalnyKontakt.imie << "|";
+        plik << oryginalnyKontakt.nazwisko << "|";
+        plik << oryginalnyKontakt.nrTelefonu << "|";
+        plik << oryginalnyKontakt.email << "|";
+        plik << oryginalnyKontakt.adres << "|" << endl;
+
+        plik.close();
+    }
 }
 
 int zapiszNowyKontaktDoPliku (vector <Kontakt> kontakty, Kontakt daneKontaktowe) {
     fstream plik;
-    plik.open("tymczasowiAdresaci.txt", ios::out | ios::trunc);
-    plik.close();
-
     Kontakt oryginalnyKontakt;
     string pobraneWJednejLiniiDaneJednegoKontaktu = "";
     int nrKontaktu = 0;
-
     fstream plikAdresaci;
     plikAdresaci.open("Adresaci.txt", ios::in);
 
@@ -244,43 +255,19 @@ int zapiszNowyKontaktDoPliku (vector <Kontakt> kontakty, Kontakt daneKontaktowe)
         while(getline(plikAdresaci,pobraneWJednejLiniiDaneJednegoKontaktu)) {
 
             oryginalnyKontakt = rozbijNaPojedynczeDane (pobraneWJednejLiniiDaneJednegoKontaktu);
-
-            fstream plik;
-            plik.open("tymczasowiAdresaci.txt", ios::out | ios::app);
-            if(plik.good()) {
-                plik << oryginalnyKontakt.idAdresata << "|";
-                plik << oryginalnyKontakt.idUzytkownika << "|";
-                plik << oryginalnyKontakt.imie << "|";
-                plik << oryginalnyKontakt.nazwisko << "|";
-                plik << oryginalnyKontakt.nrTelefonu << "|";
-                plik << oryginalnyKontakt.email << "|";
-                plik << oryginalnyKontakt.adres << "|" << endl;
-
-                plik.close();
-            }
+            zapiszDoPliku (oryginalnyKontakt);
             nrKontaktu++;
         }
     }
 
-    plik.open("tymczasowiAdresaci.txt", ios::out | ios::app);
-
-    if(plik.good()) {
-        if (nrKontaktu != 0) {
-            daneKontaktowe.idAdresata = oryginalnyKontakt.idAdresata + 1;
-        } else if (nrKontaktu == 0) {
-            daneKontaktowe.idAdresata = nrKontaktu + 1;
-        }
-        plik << daneKontaktowe.idAdresata << "|";
-        plik << daneKontaktowe.idUzytkownika << "|";
-        plik << daneKontaktowe.imie << "|";
-        plik << daneKontaktowe.nazwisko << "|";
-        plik << daneKontaktowe.nrTelefonu << "|";
-        plik << daneKontaktowe.email << "|";
-        plik << daneKontaktowe.adres << "|" << endl;
-
-        plik.close();
-        nrKontaktu++;
+    if (nrKontaktu != 0) {
+        daneKontaktowe.idAdresata = oryginalnyKontakt.idAdresata + 1;
+    } else if (nrKontaktu == 0) {
+        daneKontaktowe.idAdresata = nrKontaktu + 1;
     }
+    zapiszDoPliku (daneKontaktowe);
+    nrKontaktu++;
+
     return daneKontaktowe.idAdresata;
 }
 
@@ -477,13 +464,9 @@ void wyswietlWszystkieKontakty (vector <Kontakt> kontakty, int liczbaKontaktow) 
 }
 void zapiszPonownieKontaktyDoPlikuUsun (vector <Kontakt> kontakty, int idUsuwanegoAdresata) {
     fstream plik;
-    plik.open("tymczasowiAdresaci.txt", ios::out | ios::trunc);
-    plik.close();
-
     Kontakt oryginalnyKontakt;
     string pobraneWJednejLiniiDaneJednegoKontaktu = "";
     int nrKontaktu = 0;
-
     fstream plikAdresaci;
     plikAdresaci.open("Adresaci.txt", ios::in);
 
@@ -492,20 +475,8 @@ void zapiszPonownieKontaktyDoPlikuUsun (vector <Kontakt> kontakty, int idUsuwane
 
             oryginalnyKontakt = rozbijNaPojedynczeDane (pobraneWJednejLiniiDaneJednegoKontaktu);
 
-             if (oryginalnyKontakt.idAdresata != idUsuwanegoAdresata) {
-                fstream plik;
-                plik.open("tymczasowiAdresaci.txt", ios::out | ios::app);
-                if(plik.good()) {
-                    plik << oryginalnyKontakt.idAdresata << "|";
-                    plik << oryginalnyKontakt.idUzytkownika << "|";
-                    plik << oryginalnyKontakt.imie << "|";
-                    plik << oryginalnyKontakt.nazwisko << "|";
-                    plik << oryginalnyKontakt.nrTelefonu << "|";
-                    plik << oryginalnyKontakt.email << "|";
-                    plik << oryginalnyKontakt.adres << "|" << endl;
-
-                    plik.close();
-                }
+            if (oryginalnyKontakt.idAdresata != idUsuwanegoAdresata) {
+                zapiszDoPliku (oryginalnyKontakt);
             }
         }
         nrKontaktu++;
@@ -650,9 +621,6 @@ vector <Kontakt> edytujWybranyKontakt (vector <Kontakt> kontakty, int wyborId) {
 
 void zapiszPonownieKontaktyDoPliku (vector <Kontakt> kontakty, int indeksEdytowanegoKontaktu) {
     fstream plik;
-    plik.open("tymczasowiAdresaci.txt", ios::out | ios::trunc);
-    plik.close();
-
     Kontakt oryginalnyKontakt;
     string pobraneWJednejLiniiDaneJednegoKontaktu = "";
     int nrKontaktu = 0;
@@ -665,34 +633,9 @@ void zapiszPonownieKontaktyDoPliku (vector <Kontakt> kontakty, int indeksEdytowa
             oryginalnyKontakt = rozbijNaPojedynczeDane (pobraneWJednejLiniiDaneJednegoKontaktu);
 
             if (oryginalnyKontakt.idAdresata != kontakty[indeksEdytowanegoKontaktu].idAdresata) {
-                fstream plik;
-                plik.open("tymczasowiAdresaci.txt", ios::out | ios::app);
-                if(plik.good()) {
-                    plik << oryginalnyKontakt.idAdresata << "|";
-                    plik << oryginalnyKontakt.idUzytkownika << "|";
-                    plik << oryginalnyKontakt.imie << "|";
-                    plik << oryginalnyKontakt.nazwisko << "|";
-                    plik << oryginalnyKontakt.nrTelefonu << "|";
-                    plik << oryginalnyKontakt.email << "|";
-                    plik << oryginalnyKontakt.adres << "|" << endl;
-
-                    plik.close();
-                }
+                zapiszDoPliku (oryginalnyKontakt);
             } else  {
-                fstream plik;
-                plik.open("tymczasowiAdresaci.txt", ios::out | ios::app);
-
-                if(plik.good()) {
-                    plik << kontakty[indeksEdytowanegoKontaktu].idAdresata << "|";
-                    plik << kontakty[indeksEdytowanegoKontaktu].idUzytkownika << "|";
-                    plik << kontakty[indeksEdytowanegoKontaktu].imie << "|";
-                    plik << kontakty[indeksEdytowanegoKontaktu].nazwisko << "|";
-                    plik << kontakty[indeksEdytowanegoKontaktu].nrTelefonu << "|";
-                    plik << kontakty[indeksEdytowanegoKontaktu].email << "|";
-                    plik << kontakty[indeksEdytowanegoKontaktu].adres << "|" << endl;
-
-                    plik.close();
-                }
+                zapiszDoPliku (kontakty[indeksEdytowanegoKontaktu]);
             }
         }
         nrKontaktu++;
@@ -849,8 +792,6 @@ int main() {
 
             case '8':
                 idZalogowanegoUzytkownika = 0;
-                 cout << "liczba kontaktow I: " << liczbaKontaktow << endl;
-                Sleep(1900);
                 kontakty = usunElementyWektoraKontakty (kontakty, liczbaKontaktow);
                 liczbaKontaktow = kontakty.size();
                 break;
