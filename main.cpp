@@ -7,10 +7,154 @@
 
 using namespace std;
 
+string nazwaPlikuZUzytkownikami = "Uzytkownicy.txt";
+string nazwaPlikuZAdresatami = "Adresaci.txt";
+string nazwaTymczasowegoPlikuZAdresatami = "TymczasowiAdresaci.txt";
+
 struct Uzytkownik {
     int idUzytkownika;
     string login, haslo;
 };
+
+struct Kontakt {
+    int idAdresata;
+    int idUzytkownika;
+    string imie;
+    string nazwisko;
+    string nrTelefonu;
+    string email;
+    string adres;
+};
+int logowanie (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow);
+string pobierzDoPionowejKreski (string danePobraneWJednejLinii, int pozycja);
+Uzytkownik rozbijNaPojedynczeDaneUzytkownika (string pobraneWJednejLiniiDaneJednegoUzytkownika);
+vector <Uzytkownik> dodajObiektdaneUzytkownikaDoWektoraUzytkownicy (vector <Uzytkownik> uzytkownicy, Uzytkownik daneUzytkownika, int nrUzytkownika);
+vector <Uzytkownik> odczytajZPlikuUzytkownik (vector <Uzytkownik> uzytkownicy);
+void zapiszNowegoUzytkownika(Uzytkownik daneUzytkownikaZarejestrowanego);
+vector <Uzytkownik> rejestracja (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow);
+Kontakt rozbijNaPojedynczeDane (string pobraneWJednejLiniiDaneJednegoKontaktu);
+vector <Kontakt> dodajObiektdaneKontaktuDoWektoraKontakty (vector <Kontakt> kontakty, Kontakt daneKontaktu, int nrKontaktu);
+bool sprawdzCzyKontaktZostalUtworzonyPrzezZalogowanegoUzytkownika ( Kontakt daneKontaktu, int idZalogowanegoKontaktu);
+vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty, int idZalogowanegoUzytkownika);
+void zapiszDoPliku (Kontakt oryginalnyKontakt);
+int zapiszNowyKontaktDoPliku (vector <Kontakt> kontakty, Kontakt daneKontaktowe);
+vector <Kontakt> stworzNowyKontakt (vector <Kontakt> kontakty, int liczbaKontaktow, int idZalogowanegoUzytkownika);
+void wyswietlSzczegolyKontaktu(vector <Kontakt> kontakty, int nrIdKontaktu);
+int wyswietlListeWybranychKontaktow (vector <Kontakt> kontakty, int liczbaKontaktow, string wyszukiwaneImie, string wyszukiwaneNazwisko);
+void znajdzKontaktPoImieniu (vector <Kontakt> kontakty, int liczbaKontaktow);
+void znajdzKontaktPoNazwisku (vector <Kontakt> kontakty, int liczbaKontaktow);
+void wyswietlListeWszystkichKontaktow (vector <Kontakt> kontakty, int liczbaKontaktow);
+void wyswietlMenuListyKontaktow (vector <Kontakt> kontakty, int liczbaKontaktow);
+void wyswietlWszystkieKontakty (vector <Kontakt> kontakty, int liczbaKontaktow);
+void zapiszPonownieKontaktyDoPlikuUsun (vector <Kontakt> kontakty, int idUsuwanegoAdresata);
+vector <Kontakt> usunWybranyKontakt (vector <Kontakt> kontakty, int liczbaKontaktow);
+vector <Kontakt> edytujWybranyKontakt (vector <Kontakt> kontakty, int wyborId);
+void zapiszPonownieKontaktyDoPliku (vector <Kontakt> kontakty, int indeksEdytowanegoKontaktu);
+vector <Kontakt> wybierzKontaktDoEdycji (vector <Kontakt> kontakty, int numerIdKontaktu);
+vector <Uzytkownik> zmianaHasla (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow, int idZalogowanegoUzytkownika);
+void zapiszPonownieUzytkownikaDoPliku(vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow);
+vector <Kontakt> usunElementyWektoraKontakty (vector <Kontakt> kontakty, int liczbaKontaktow);
+
+
+
+
+
+int main() {
+
+    vector <Uzytkownik> uzytkownicy;
+    int liczbaUzytkownikow = 0;
+    int idZalogowanegoUzytkownika = 0;  // 0 tj. zaden uzytkownik nie jest zalogowany
+    char wybor;
+
+    vector <Kontakt> kontakty;
+    int liczbaKontaktow = 0;
+
+    uzytkownicy = odczytajZPlikuUzytkownik(uzytkownicy);
+    liczbaUzytkownikow = uzytkownicy.size();
+
+    while(1) {
+        if (idZalogowanegoUzytkownika == 0) {
+            system("cls");
+            cout << endl << "------- KSIAZKA ADRESOWA -------" << endl << endl;
+            cout << "1. Logowanie" << endl;
+            cout << "2. Rejestracja" << endl;
+            cout << "3. Zamknij program" << endl;
+            wybor = getch();
+
+            switch(wybor) {
+            case '1': {
+
+                idZalogowanegoUzytkownika = logowanie(uzytkownicy, liczbaUzytkownikow);
+                kontakty = odczytajZPliku (kontakty, idZalogowanegoUzytkownika);
+                liczbaKontaktow = kontakty.size();
+                break;
+            }
+
+            case '2':
+                uzytkownicy = rejestracja(uzytkownicy, liczbaUzytkownikow);
+                liczbaUzytkownikow++;
+                break;
+
+            case '3':
+                exit(0);
+            }
+        } else {
+            system("cls");
+            cout << endl << "------- KSIAZKA ADRESOWA -------" << endl << endl;
+            cout << "1. Dodaj adresata" << endl;
+            cout << "2. Wyszukaj po imieniu" << endl;
+            cout << "3. Wyszukaj po nazwisku" << endl;
+            cout << "4. Wyswietl wszystkich adresatow" << endl;
+            cout << "5. Usun adresata" << endl;
+            cout << "6. Edytuj adresata" << endl;
+            cout << "7. Zmien haslo" << endl;
+            cout << "8. Wyloguj sie" << endl << endl;
+            cout << "Twoj wybor: ";
+
+            wybor = getch();
+            switch(wybor) {
+            case '1':
+
+                kontakty = stworzNowyKontakt (kontakty, liczbaKontaktow, idZalogowanegoUzytkownika);
+                liczbaKontaktow = kontakty.size();
+                break;
+
+            case '2':
+                znajdzKontaktPoImieniu (kontakty, liczbaKontaktow);
+                break;
+
+            case '3':
+                znajdzKontaktPoNazwisku (kontakty, liczbaKontaktow);
+                break;
+
+            case '4':
+                wyswietlWszystkieKontakty(kontakty, liczbaKontaktow);
+                break;
+
+            case '5':
+                kontakty = usunWybranyKontakt (kontakty, liczbaKontaktow);
+                liczbaKontaktow = kontakty.size();
+                break;
+
+            case '6':
+                kontakty = wybierzKontaktDoEdycji (kontakty, liczbaKontaktow);
+                break;
+
+            case '7':
+                uzytkownicy = zmianaHasla (uzytkownicy, liczbaUzytkownikow, idZalogowanegoUzytkownika);
+                zapiszPonownieUzytkownikaDoPliku(uzytkownicy, liczbaUzytkownikow);
+                break;
+
+            case '8':
+                idZalogowanegoUzytkownika = 0;
+                kontakty = usunElementyWektoraKontakty (kontakty, liczbaKontaktow);
+                liczbaKontaktow = kontakty.size();
+                break;
+            }
+        }
+    }
+    return 0;
+}
 
 int logowanie (vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow) {
     Uzytkownik daneUzytkownikaDoZalogowania;
@@ -70,6 +214,7 @@ Uzytkownik rozbijNaPojedynczeDaneUzytkownika (string pobraneWJednejLiniiDaneJedn
     }
     return daneUzytkownika;
 }
+
 vector <Uzytkownik> dodajObiektdaneUzytkownikaDoWektoraUzytkownicy (vector <Uzytkownik> uzytkownicy, Uzytkownik daneUzytkownika, int nrUzytkownika) {
     uzytkownicy.push_back(Uzytkownik());
     uzytkownicy[nrUzytkownika].idUzytkownika = daneUzytkownika.idUzytkownika;
@@ -85,7 +230,7 @@ vector <Uzytkownik> odczytajZPlikuUzytkownik (vector <Uzytkownik> uzytkownicy) {
     int nrUzytkownika = 0;
 
     fstream plik;
-    plik.open("Uzytkownicy.txt", ios::in);
+    plik.open(nazwaPlikuZUzytkownikami.c_str(), ios::in);
 
     if(plik.good() == true) {
         while(getline(plik,pobraneWJednejLiniiDaneJednegoUzytkownika)) {
@@ -100,7 +245,7 @@ vector <Uzytkownik> odczytajZPlikuUzytkownik (vector <Uzytkownik> uzytkownicy) {
 
 void zapiszNowegoUzytkownika(Uzytkownik daneUzytkownikaZarejestrowanego) {
     fstream plik;
-    plik.open("Uzytkownicy.txt", ios::out | ios::app);
+    plik.open(nazwaPlikuZUzytkownikami.c_str(), ios::out | ios::app);
 
     if(plik.good()== true) {
         plik << daneUzytkownikaZarejestrowanego.idUzytkownika << "|";
@@ -143,16 +288,6 @@ vector <Uzytkownik> rejestracja (vector <Uzytkownik> uzytkownicy, int liczbaUzyt
 
     return uzytkownicy;
 }
-
-struct Kontakt {
-    int idAdresata;
-    int idUzytkownika;
-    string imie;
-    string nazwisko;
-    string nrTelefonu;
-    string email;
-    string adres;
-};
 
 Kontakt rozbijNaPojedynczeDane (string pobraneWJednejLiniiDaneJednegoKontaktu) {
     Kontakt daneKontaktu;
@@ -211,7 +346,7 @@ vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty, int idZalogowanegoUz
     int nrKontaktu = 0;
 
     fstream plik;
-    plik.open("Adresaci.txt", ios::in);
+    plik.open(nazwaPlikuZAdresatami.c_str(), ios::in);
 
     if(plik.good() == true) {
         while(getline(plik,pobraneWJednejLiniiDaneJednegoKontaktu)) {
@@ -229,7 +364,7 @@ vector <Kontakt> odczytajZPliku (vector <Kontakt> kontakty, int idZalogowanegoUz
 
 void zapiszDoPliku (Kontakt oryginalnyKontakt) {
     fstream plik;
-    plik.open("tymczasowiAdresaci.txt", ios::out | ios::app);
+    plik.open(nazwaTymczasowegoPlikuZAdresatami.c_str(), ios::out | ios::app);
     if(plik.good()) {
         plik << oryginalnyKontakt.idAdresata << "|";
         plik << oryginalnyKontakt.idUzytkownika << "|";
@@ -249,7 +384,7 @@ int zapiszNowyKontaktDoPliku (vector <Kontakt> kontakty, Kontakt daneKontaktowe)
     string pobraneWJednejLiniiDaneJednegoKontaktu = "";
     int nrKontaktu = 0;
     fstream plikAdresaci;
-    plikAdresaci.open("Adresaci.txt", ios::in);
+    plikAdresaci.open(nazwaPlikuZAdresatami.c_str(), ios::in);
 
     if(plikAdresaci.good() == true) {
         while(getline(plikAdresaci,pobraneWJednejLiniiDaneJednegoKontaktu)) {
@@ -294,8 +429,8 @@ vector <Kontakt> stworzNowyKontakt (vector <Kontakt> kontakty, int liczbaKontakt
 
     daneKontaktu.idUzytkownika = idZalogowanegoUzytkownika;
     daneKontaktu.idAdresata = zapiszNowyKontaktDoPliku (kontakty, daneKontaktu);
-    remove ("Adresaci.txt");
-    rename( "tymczasowiAdresaci.txt", "Adresaci.txt" );
+    remove (nazwaPlikuZAdresatami.c_str());
+    rename( nazwaTymczasowegoPlikuZAdresatami.c_str(), nazwaPlikuZAdresatami.c_str() );
     kontakty = dodajObiektdaneKontaktuDoWektoraKontakty (kontakty, daneKontaktu, liczbaKontaktow);
 
     return kontakty;
@@ -407,7 +542,6 @@ void wyswietlListeWszystkichKontaktow (vector <Kontakt> kontakty, int liczbaKont
     }
 }
 
-void wyswietlWszystkieKontakty (vector <Kontakt> kontakty, int liczbaKontaktow);
 
 void wyswietlMenuListyKontaktow (vector <Kontakt> kontakty, int liczbaKontaktow) {
     char wyborMenu;
@@ -462,13 +596,14 @@ void wyswietlWszystkieKontakty (vector <Kontakt> kontakty, int liczbaKontaktow) 
         }
     }
 }
+
 void zapiszPonownieKontaktyDoPlikuUsun (vector <Kontakt> kontakty, int idUsuwanegoAdresata) {
     fstream plik;
     Kontakt oryginalnyKontakt;
     string pobraneWJednejLiniiDaneJednegoKontaktu = "";
     int nrKontaktu = 0;
     fstream plikAdresaci;
-    plikAdresaci.open("Adresaci.txt", ios::in);
+    plikAdresaci.open(nazwaPlikuZAdresatami.c_str(), ios::in);
 
     if(plikAdresaci.good() == true) {
         while(getline(plikAdresaci,pobraneWJednejLiniiDaneJednegoKontaktu)) {
@@ -510,8 +645,8 @@ vector <Kontakt> usunWybranyKontakt (vector <Kontakt> kontakty, int liczbaKontak
 
                     idUsuwanegoAdresata = kontakty[wyborId - 1].idAdresata;
                     zapiszPonownieKontaktyDoPlikuUsun(kontakty, idUsuwanegoAdresata);
-                    remove ("Adresaci.txt");
-                    rename( "tymczasowiAdresaci.txt", "Adresaci.txt" );
+                    remove (nazwaPlikuZAdresatami.c_str());
+                    rename( nazwaTymczasowegoPlikuZAdresatami.c_str(), nazwaPlikuZAdresatami.c_str() );
                     kontakty.erase(kontakty.begin() + i);
                     liczbaWynikow++;
                     cout << "Kontakt zostal usuniety.";
@@ -626,7 +761,7 @@ void zapiszPonownieKontaktyDoPliku (vector <Kontakt> kontakty, int indeksEdytowa
     int nrKontaktu = 0;
 
     fstream plikAdresaci;
-    plikAdresaci.open("Adresaci.txt", ios::in);
+    plikAdresaci.open(nazwaPlikuZAdresatami.c_str(), ios::in);
 
     if(plikAdresaci.good() == true) {
         while(getline(plikAdresaci,pobraneWJednejLiniiDaneJednegoKontaktu)) {
@@ -656,8 +791,8 @@ vector <Kontakt> wybierzKontaktDoEdycji (vector <Kontakt> kontakty, int numerIdK
 
         kontakty = edytujWybranyKontakt (kontakty, wyborId);
         zapiszPonownieKontaktyDoPliku(kontakty, (wyborId - 1));
-        remove ("Adresaci.txt");
-        rename( "tymczasowiAdresaci.txt", "Adresaci.txt" );
+        remove (nazwaPlikuZAdresatami.c_str());
+        rename( nazwaTymczasowegoPlikuZAdresatami.c_str(), nazwaPlikuZAdresatami.c_str() );
     }
 
     return kontakty;
@@ -686,7 +821,7 @@ vector <Uzytkownik> zmianaHasla (vector <Uzytkownik> uzytkownicy, int liczbaUzyt
 
 void zapiszPonownieUzytkownikaDoPliku(vector <Uzytkownik> uzytkownicy, int liczbaUzytkownikow) {
     fstream plik;
-    plik.open("Uzytkownicy.txt", ios::in | ios::out | ios::trunc );
+    plik.open(nazwaPlikuZUzytkownikami.c_str(), ios::in | ios::out | ios::trunc );
 
     if(plik.good()) {
         for (int i = 0; i < liczbaUzytkownikow; i++) {
@@ -704,100 +839,6 @@ vector <Kontakt> usunElementyWektoraKontakty (vector <Kontakt> kontakty, int lic
     return kontakty;
 }
 
-int main() {
 
-    vector <Uzytkownik> uzytkownicy;
-    int liczbaUzytkownikow = 0;
-    int idZalogowanegoUzytkownika = 0;  // 0 tj. zaden uzytkownik nie jest zalogowany
-    char wybor;
 
-    vector <Kontakt> kontakty;
-    int liczbaKontaktow = 0;
-
-    uzytkownicy = odczytajZPlikuUzytkownik(uzytkownicy);
-    liczbaUzytkownikow = uzytkownicy.size();
-
-    while(1) {
-        if (idZalogowanegoUzytkownika == 0) {
-            system("cls");
-            cout << endl << "------- KSIAZKA ADRESOWA -------" << endl << endl;
-            cout << "1. Logowanie" << endl;
-            cout << "2. Rejestracja" << endl;
-            cout << "3. Zamknij program" << endl;
-            wybor = getch();
-
-            switch(wybor) {
-            case '1': {
-
-                idZalogowanegoUzytkownika = logowanie(uzytkownicy, liczbaUzytkownikow);
-                kontakty = odczytajZPliku (kontakty, idZalogowanegoUzytkownika);
-                liczbaKontaktow = kontakty.size();
-                break;
-            }
-
-            case '2':
-                uzytkownicy = rejestracja(uzytkownicy, liczbaUzytkownikow);
-                liczbaUzytkownikow++;
-                break;
-
-            case '3':
-                exit(0);
-            }
-        } else {
-            system("cls");
-            cout << endl << "------- KSIAZKA ADRESOWA -------" << endl << endl;
-            cout << "1. Dodaj adresata" << endl;
-            cout << "2. Wyszukaj po imieniu" << endl;
-            cout << "3. Wyszukaj po nazwisku" << endl;
-            cout << "4. Wyswietl wszystkich adresatow" << endl;
-            cout << "5. Usun adresata" << endl;
-            cout << "6. Edytuj adresata" << endl;
-            cout << "7. Zmien haslo" << endl;
-            cout << "8. Wyloguj sie" << endl << endl;
-            cout << "Twoj wybor: ";
-
-            wybor = getch();
-            switch(wybor) {
-            case '1':
-
-                kontakty = stworzNowyKontakt (kontakty, liczbaKontaktow, idZalogowanegoUzytkownika);
-                liczbaKontaktow = kontakty.size();
-                break;
-
-            case '2':
-                znajdzKontaktPoImieniu (kontakty, liczbaKontaktow);
-                break;
-
-            case '3':
-                znajdzKontaktPoNazwisku (kontakty, liczbaKontaktow);
-                break;
-
-            case '4':
-                wyswietlWszystkieKontakty(kontakty, liczbaKontaktow);
-                break;
-
-            case '5':
-                kontakty = usunWybranyKontakt (kontakty, liczbaKontaktow);
-                liczbaKontaktow = kontakty.size();
-                break;
-
-            case '6':
-                kontakty = wybierzKontaktDoEdycji (kontakty, liczbaKontaktow);
-                break;
-
-            case '7':
-                uzytkownicy = zmianaHasla (uzytkownicy, liczbaUzytkownikow, idZalogowanegoUzytkownika);
-                zapiszPonownieUzytkownikaDoPliku(uzytkownicy, liczbaUzytkownikow);
-                break;
-
-            case '8':
-                idZalogowanegoUzytkownika = 0;
-                kontakty = usunElementyWektoraKontakty (kontakty, liczbaKontaktow);
-                liczbaKontaktow = kontakty.size();
-                break;
-            }
-        }
-    }
-    return 0;
-}
 
